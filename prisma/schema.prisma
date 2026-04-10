@@ -1,0 +1,131 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  OWNER
+  TENANT
+}
+
+enum UnitType {
+  HOUSE
+  MASTER_BEDROOM
+  NORMAL_ROOM
+}
+
+enum UnitStatus {
+  VACANT
+  OCCUPIED
+  RESERVED
+  MAINTENANCE
+}
+
+enum LeaseStatus {
+  UPCOMING
+  ACTIVE
+  COMPLETED
+}
+
+enum Audience {
+  TENANTS
+  OWNER_ONLY
+  EVERYONE
+}
+
+model User {
+  id                 String            @id @default(cuid())
+  name               String
+  email              String            @unique
+  role               Role
+  phone              String?
+  avatarColor        String?
+  managedAssignments LeaseAssignment[] @relation("AdminAssignments")
+  ownedProperties    Property[]        @relation("OwnerProperties")
+  tenantAssignments  LeaseAssignment[] @relation("TenantAssignments")
+  sentMessages       Message[]         @relation("SentMessages")
+  receivedMessages   Message[]         @relation("ReceivedMessages")
+  announcements      Announcement[]    @relation("AnnouncementAuthor")
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+}
+
+model Property {
+  id            String         @id @default(cuid())
+  name          String
+  location      String
+  description   String?
+  ownerId       String
+  owner         User           @relation("OwnerProperties", fields: [ownerId], references: [id])
+  units         Unit[]
+  announcements Announcement[]
+  messages      Message[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+}
+
+model Unit {
+  id               String            @id @default(cuid())
+  propertyId       String
+  name             String
+  type             UnitType
+  monthlyRent      Int
+  status           UnitStatus        @default(VACANT)
+  capacity         Int               @default(1)
+  floorLabel       String?
+  isPrivateBath    Boolean           @default(false)
+  property         Property          @relation(fields: [propertyId], references: [id])
+  leaseAssignments LeaseAssignment[]
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+}
+
+model LeaseAssignment {
+  id              String      @id @default(cuid())
+  unitId          String
+  tenantId        String
+  assignedById    String
+  startDate       DateTime
+  endDate         DateTime
+  securityDeposit Int        @default(0)
+  notes           String?
+  status          LeaseStatus @default(ACTIVE)
+  unit            Unit        @relation(fields: [unitId], references: [id])
+  tenant          User        @relation("TenantAssignments", fields: [tenantId], references: [id])
+  assignedBy      User        @relation("AdminAssignments", fields: [assignedById], references: [id])
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+}
+
+model Announcement {
+  id         String    @id @default(cuid())
+  propertyId String
+  authorId   String
+  title      String
+  body       String
+  audience   Audience  @default(TENANTS)
+  property   Property  @relation(fields: [propertyId], references: [id])
+  author     User      @relation("AnnouncementAuthor", fields: [authorId], references: [id])
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+}
+
+model Message {
+  id          String    @id @default(cuid())
+  propertyId  String?
+  senderId    String
+  recipientId String
+  subject     String
+  body        String
+  readAt      DateTime?
+  property    Property? @relation(fields: [propertyId], references: [id])
+  sender      User      @relation("SentMessages", fields: [senderId], references: [id])
+  recipient   User      @relation("ReceivedMessages", fields: [recipientId], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
