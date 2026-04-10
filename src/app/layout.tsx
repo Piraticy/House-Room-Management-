@@ -14,9 +14,9 @@ const ibmPlexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Harbor Stay Control Center",
+  title: "Tanga Property Desk",
   description:
-    "Starter rental management dashboard for admins, owners, and tenants managing house, master bedroom, and normal room stays.",
+    "Property and room management system for homes in Tanga, with admin, owner, and tenant work areas.",
 };
 
 export default function RootLayout({
@@ -27,6 +27,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      data-scroll-behavior="smooth"
       className={`${spaceGrotesk.variable} ${ibmPlexMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>

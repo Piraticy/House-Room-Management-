@@ -1,20 +1,22 @@
 # Harbor Stay Control Center
 
-A starter rent-management app for properties that include a full house, master bedrooms, and normal rooms.
+A role-based rental management starter for properties that include a full house, master bedrooms, and normal rooms.
 
 ## What it includes
 
-- Admin dashboard for assigning tenants to a house or room
-- Editable pricing for `House`, `Master Bedroom`, and `Normal Room` units
-- Owner announcement and direct tenant messaging tools
-- Tenant view with in-app alerts when rent is within 60 days of due date
-- Seeded demo data for admin, owner, and tenant previews
+- Real credentials login for `Admin`, `Owner`, and `Tenant`
+- Separate role dashboards instead of one crowded page
+- Admin pricing and lease assignment controls
+- Owner announcements and direct tenant messaging
+- Tenant stay details, inbox, and due-soon rent alerts
+- Seeded demo accounts for local testing
 
 ## Stack
 
 - Next.js 16
 - TypeScript
 - Tailwind CSS 4
+- Auth.js / NextAuth credentials auth
 - Prisma
 - SQLite
 
@@ -30,12 +32,19 @@ npm run dev
 
 Then open [http://localhost:3000](http://localhost:3000).
 
-## Demo workflow
+## Demo accounts
 
-- Switch between `Admin`, `Owner`, and `Tenant` from the top of the dashboard
-- Use the Admin view to assign rooms, change stay length, and edit prices
-- Use the Owner view to publish announcements and send direct messages
-- Use the Tenant view to see current stay details and due-soon notifications
+- Admin: `admin@harborstay.app` / `Admin@123`
+- Owner: `owner@harborstay.app` / `Owner@123`
+- Tenant: `mina@harborstay.app` / `Tenant@123`
+
+## App structure
+
+- `/` landing page
+- `/login` credentials sign-in
+- `/admin` admin-only pricing and assignment workspace
+- `/owner` owner-only communication workspace
+- `/tenant` tenant-only stay and alert workspace
 
 ## Database commands
 

@@ -38,10 +38,38 @@ enum Audience {
   EVERYONE
 }
 
+enum PaymentMethod {
+  CASH
+  MOBILE_MONEY
+  BANK_TRANSFER
+}
+
+enum InventoryStatus {
+  IN_STOCK
+  LOW_STOCK
+  USED_UP
+}
+
+enum ExpenseCategory {
+  UTILITIES
+  MAINTENANCE
+  REPAIR
+  STAFF
+  SUPPLIES
+  OTHER
+}
+
+enum RepairStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+}
+
 model User {
   id                 String            @id @default(cuid())
   name               String
   email              String            @unique
+  passwordHash       String
   role               Role
   phone              String?
   avatarColor        String?
@@ -51,22 +79,33 @@ model User {
   sentMessages       Message[]         @relation("SentMessages")
   receivedMessages   Message[]         @relation("ReceivedMessages")
   announcements      Announcement[]    @relation("AnnouncementAuthor")
+  recordedPayments   Payment[]         @relation("RecordedPayments")
+  inventoryEntries   InventoryItem[]   @relation("InventoryEntries")
+  expenseEntries     Expense[]         @relation("ExpenseEntries")
+  repairEntries      RepairLog[]       @relation("RepairEntries")
   createdAt          DateTime          @default(now())
   updatedAt          DateTime          @updatedAt
 }
 
 model Property {
-  id            String         @id @default(cuid())
-  name          String
-  location      String
-  description   String?
-  ownerId       String
-  owner         User           @relation("OwnerProperties", fields: [ownerId], references: [id])
-  units         Unit[]
-  announcements Announcement[]
-  messages      Message[]
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
+  id             String          @id @default(cuid())
+  name           String
+  location       String
+  region         String          @default("Tanga")
+  district       String
+  ward           String
+  description    String?
+  ownerId        String
+  owner          User            @relation("OwnerProperties", fields: [ownerId], references: [id])
+  units          Unit[]
+  announcements  Announcement[]
+  messages       Message[]
+  payments       Payment[]
+  inventoryItems InventoryItem[]
+  expenses       Expense[]
+  repairLogs     RepairLog[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
 }
 
 model Unit {
@@ -78,9 +117,16 @@ model Unit {
   status           UnitStatus        @default(VACANT)
   capacity         Int               @default(1)
   floorLabel       String?
+  sizeLabel        String?
+  visualLabel      String?
+  furnishings      String?
+  photoUrl         String?
+  themeColor       String?
+  accentColor      String?
   isPrivateBath    Boolean           @default(false)
   property         Property          @relation(fields: [propertyId], references: [id])
   leaseAssignments LeaseAssignment[]
+  repairLogs       RepairLog[]
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @updatedAt
 }
@@ -92,12 +138,13 @@ model LeaseAssignment {
   assignedById    String
   startDate       DateTime
   endDate         DateTime
-  securityDeposit Int        @default(0)
+  securityDeposit Int         @default(0)
   notes           String?
   status          LeaseStatus @default(ACTIVE)
   unit            Unit        @relation(fields: [unitId], references: [id])
   tenant          User        @relation("TenantAssignments", fields: [tenantId], references: [id])
   assignedBy      User        @relation("AdminAssignments", fields: [assignedById], references: [id])
+  payments        Payment[]
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
 }
@@ -128,4 +175,73 @@ model Message {
   recipient   User      @relation("ReceivedMessages", fields: [recipientId], references: [id])
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+}
+
+model Payment {
+  id               String           @id @default(cuid())
+  propertyId       String
+  assignmentId     String?
+  recordedById     String
+  amount           Int
+  paidOn           DateTime
+  paymentMethod    PaymentMethod    @default(CASH)
+  reference        String?
+  notes            String?
+  property         Property         @relation(fields: [propertyId], references: [id])
+  assignment       LeaseAssignment? @relation(fields: [assignmentId], references: [id])
+  recordedBy       User             @relation("RecordedPayments", fields: [recordedById], references: [id])
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+}
+
+model InventoryItem {
+  id            String          @id @default(cuid())
+  propertyId    String
+  createdById   String
+  name          String
+  quantity      Int
+  unitCost      Int
+  locationLabel String?
+  status        InventoryStatus @default(IN_STOCK)
+  notes         String?
+  property      Property        @relation(fields: [propertyId], references: [id])
+  createdBy     User            @relation("InventoryEntries", fields: [createdById], references: [id])
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+}
+
+model Expense {
+  id          String          @id @default(cuid())
+  propertyId  String
+  createdById String
+  title       String
+  amount      Int
+  spentOn     DateTime
+  category    ExpenseCategory @default(OTHER)
+  vendor      String?
+  notes       String?
+  property    Property        @relation(fields: [propertyId], references: [id])
+  createdBy   User            @relation("ExpenseEntries", fields: [createdById], references: [id])
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+}
+
+model RepairLog {
+  id            String       @id @default(cuid())
+  propertyId    String
+  unitId        String?
+  createdById   String
+  issueTitle    String
+  details       String
+  status        RepairStatus @default(OPEN)
+  reportedOn    DateTime
+  resolvedOn    DateTime?
+  estimatedCost Int          @default(0)
+  actualCost    Int          @default(0)
+  technician    String?
+  property      Property     @relation(fields: [propertyId], references: [id])
+  unit          Unit?        @relation(fields: [unitId], references: [id])
+  createdBy     User         @relation("RepairEntries", fields: [createdById], references: [id])
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
 }
