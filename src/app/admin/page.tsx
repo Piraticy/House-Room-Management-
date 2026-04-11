@@ -1,9 +1,13 @@
 import {
+  BadgeDollarSign,
   BellRing,
   CircleDollarSign,
+  DoorClosed,
   Hammer,
+  House,
+  Plus,
   Package2,
-  PlusCircle,
+  ShowerHead,
   Wallet,
 } from "lucide-react";
 import { PaymentMethod, RepairStatus, Role, UnitType } from "@prisma/client";
@@ -19,8 +23,10 @@ import {
 } from "@/app/actions";
 import { AppShell } from "@/components/dashboard/app-shell";
 import { UnitBlueprint } from "@/components/dashboard/unit-blueprint";
+import { UnitFacts } from "@/components/dashboard/unit-facts";
 import {
   expenseCategoryLabel,
+  formatCompactCurrency,
   formatCurrency,
   formatDate,
   getAdminDashboardData,
@@ -28,7 +34,6 @@ import {
   paymentMethodLabel,
   repairStatusLabel,
   unitTypeLabel,
-  unitUseLabel,
 } from "@/lib/dashboard";
 import { requireRole } from "@/lib/auth";
 
@@ -120,23 +125,23 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
       description={sectionMeta.description}
     >
       {section === "overview" ? (
-        <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+        <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-5">
           <StatCard
             icon={CircleDollarSign}
             label="Income"
-            value={formatCurrency(data.stats.totalIncome)}
+            value={formatCompactCurrency(data.stats.totalIncome)}
             detail="Payments entered"
           />
           <StatCard
             icon={Wallet}
             label="Expenses"
-            value={formatCurrency(data.stats.totalExpenses)}
+            value={formatCompactCurrency(data.stats.totalExpenses)}
             detail="Recorded costs"
           />
           <StatCard
             icon={BellRing}
             label="Net"
-            value={formatCurrency(data.stats.netIncome)}
+            value={formatCompactCurrency(data.stats.netIncome)}
             detail="Income after costs"
           />
           <StatCard
@@ -227,7 +232,6 @@ function HousesSection({ data }: { data: Awaited<ReturnType<typeof getAdminDashb
       .map((unit) => ({
         ...unit,
         propertyName: property.name,
-        propertyLocation: property.location,
       })),
   );
 
@@ -250,7 +254,6 @@ function HousesSection({ data }: { data: Awaited<ReturnType<typeof getAdminDashb
               key={unit.id}
               unit={unit}
               propertyName={unit.propertyName}
-              propertyLocation={unit.propertyLocation}
             />
           ))}
         </div>
@@ -276,7 +279,7 @@ function HousesSection({ data }: { data: Awaited<ReturnType<typeof getAdminDashb
           <input className="field" name="floorLabel" placeholder="Block or location note" />
           <textarea className="field min-h-24" name="notes" placeholder="Short note about the house" />
           <button className="primary-button w-full" type="submit">
-            <PlusCircle className="mr-2 size-4" />
+            <Plus className="mr-2 size-4" />
             Add house
           </button>
         </form>
@@ -292,7 +295,6 @@ function RoomsSection({ data }: { data: Awaited<ReturnType<typeof getAdminDashbo
       .map((unit) => ({
         ...unit,
         propertyName: property.name,
-        propertyLocation: property.location,
       })),
   );
 
@@ -315,7 +317,6 @@ function RoomsSection({ data }: { data: Awaited<ReturnType<typeof getAdminDashbo
               key={unit.id}
               unit={unit}
               propertyName={unit.propertyName}
-              propertyLocation={unit.propertyLocation}
             />
           ))}
         </div>
@@ -346,7 +347,7 @@ function RoomsSection({ data }: { data: Awaited<ReturnType<typeof getAdminDashbo
           <input className="field" name="floorLabel" placeholder="Floor or block" />
           <textarea className="field min-h-24" name="notes" placeholder="Short note about the room" />
           <button className="primary-button w-full" type="submit">
-            <PlusCircle className="mr-2 size-4" />
+            <Plus className="mr-2 size-4" />
             Add room
           </button>
         </form>
@@ -362,9 +363,9 @@ function AssignmentsSection({ data }: { data: Awaited<ReturnType<typeof getAdmin
         <p className="eyebrow">Stay control</p>
         <h2 className="mt-2 text-2xl font-semibold">Assignments and dates</h2>
 
-        <form action={createLeaseAssignment} className="mt-5 rounded-[24px] bg-stone-950 p-5 text-white">
+        <form action={createLeaseAssignment} className="mt-5 rounded-[24px] border border-slate-200 bg-slate-50 p-5">
           <div className="space-y-3">
-            <select className="field bg-white text-stone-900" name="unitId" defaultValue="">
+            <select className="field" name="unitId" defaultValue="">
               <option value="" disabled>
                 Choose vacant room
               </option>
@@ -374,7 +375,7 @@ function AssignmentsSection({ data }: { data: Awaited<ReturnType<typeof getAdmin
                 </option>
               ))}
             </select>
-            <select className="field bg-white text-stone-900" name="tenantId" defaultValue="">
+            <select className="field" name="tenantId" defaultValue="">
               <option value="" disabled>
                 Choose tenant
               </option>
@@ -385,11 +386,11 @@ function AssignmentsSection({ data }: { data: Awaited<ReturnType<typeof getAdmin
               ))}
             </select>
             <div className="grid gap-3 sm:grid-cols-2">
-              <input className="field bg-white text-stone-900" type="date" name="startDate" />
-              <input className="field bg-white text-stone-900" type="date" name="endDate" />
+              <input className="field" type="date" name="startDate" />
+              <input className="field" type="date" name="endDate" />
             </div>
-            <input className="field bg-white text-stone-900" type="number" min="0" name="securityDeposit" placeholder="Deposit in TZS" />
-            <textarea className="field min-h-24 bg-white text-stone-900" name="notes" placeholder="Notes about move-in or agreement" />
+            <input className="field" type="number" min="0" name="securityDeposit" placeholder="Deposit in TZS" />
+            <textarea className="field min-h-24" name="notes" placeholder="Notes about move-in or agreement" />
             <button className="primary-button w-full" type="submit">
               Save assignment
             </button>
@@ -402,7 +403,7 @@ function AssignmentsSection({ data }: { data: Awaited<ReturnType<typeof getAdmin
           {data.assignments.map((assignment) => (
             <div key={assignment.id} className="rounded-[24px] border border-stone-200 bg-white/85 p-4">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="rounded-full bg-teal-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-teal-700">
+                <span className="rounded-full bg-sky-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-sky-700">
                   {assignment.status}
                 </span>
                 <span className="rounded-full bg-stone-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-stone-700">
@@ -676,7 +677,6 @@ function RepairsSection({ data }: { data: Awaited<ReturnType<typeof getAdminDash
 function SimpleUnitCard({
   unit,
   propertyName,
-  propertyLocation,
 }: {
   unit: {
     id: string;
@@ -693,7 +693,6 @@ function SimpleUnitCard({
     }>;
   };
   propertyName: string;
-  propertyLocation: string;
 }) {
   const activeLease = unit.leaseAssignments[0];
 
@@ -701,7 +700,7 @@ function SimpleUnitCard({
     <article className="rounded-[24px] border border-stone-200 bg-white/90 p-4">
       <UnitBlueprint type={unit.type} />
       <div className="mt-4 flex flex-wrap items-center gap-2">
-        <span className="rounded-full bg-teal-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-teal-700">
+        <span className="rounded-full bg-sky-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-sky-700">
           {unitTypeLabel(unit.type)}
         </span>
         <span className="rounded-full bg-stone-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-stone-700">
@@ -709,29 +708,36 @@ function SimpleUnitCard({
         </span>
       </div>
       <h3 className="mt-3 text-lg font-semibold text-stone-900">{unit.name}</h3>
-      <p className="mt-1 text-sm text-stone-500">
-        {propertyName} · {propertyLocation}
-      </p>
-      <p className="mt-2 text-sm font-medium text-stone-700">
-        {unitUseLabel(unit.type)}
-        {unit.floorLabel ? ` · ${unit.floorLabel}` : ""}
-      </p>
-      {unit.furnishings ? (
-        <p className="mt-2 text-sm leading-6 text-stone-600">{unit.furnishings}</p>
-      ) : null}
-      <p className="mt-3 text-sm text-stone-700">
-        {activeLease
-          ? `${activeLease.tenant.name} stays until ${formatDate(activeLease.endDate)}`
-          : "Currently vacant"}
-      </p>
+      <UnitFacts
+        type={unit.type}
+        propertyName={propertyName}
+        floorLabel={unit.floorLabel}
+        finalLabel={
+          activeLease
+            ? `${activeLease.tenant.name} until ${formatDate(activeLease.endDate)}`
+            : "Vacant now"
+        }
+      />
       <div className="mt-4 rounded-[20px] bg-stone-50 p-4">
         <p className="text-xs uppercase tracking-[0.22em] text-stone-500">Monthly price</p>
-        <p className="mt-2 text-2xl font-semibold text-stone-900">{formatCurrency(unit.monthlyRent)}</p>
-        <form action={updateUnitPricing} className="mt-4 flex flex-col gap-3 sm:flex-row">
+        <div className="mt-3 flex items-center justify-between gap-3">
+          <p className="text-2xl font-semibold text-stone-900">{formatCurrency(unit.monthlyRent)}</p>
+          <div className="rounded-2xl bg-white p-2 text-sky-700 shadow-sm">
+            {unit.type === UnitType.HOUSE ? (
+              <House className="size-4" />
+            ) : unit.type === UnitType.MASTER_BEDROOM ? (
+              <ShowerHead className="size-4" />
+            ) : (
+              <DoorClosed className="size-4" />
+            )}
+          </div>
+        </div>
+        <form action={updateUnitPricing} className="mt-4 grid gap-3 sm:grid-cols-[1fr_auto]">
           <input type="hidden" name="unitId" value={unit.id} />
           <input className="field" type="number" min="1" name="monthlyRent" defaultValue={unit.monthlyRent} />
           <button className="primary-button sm:min-w-32" type="submit">
-            Save price
+            <BadgeDollarSign className="mr-2 size-4" />
+            Save
           </button>
         </form>
       </div>
@@ -758,11 +764,13 @@ function StatCard({
     <div className="panel p-5">
       <div className="flex items-center justify-between gap-3">
         <p className="text-sm font-medium text-stone-500">{label}</p>
-        <div className="rounded-2xl bg-stone-100 p-2 text-stone-700">
+        <div className="rounded-2xl bg-sky-50 p-2 text-sky-700">
           <Icon className="size-4" />
         </div>
       </div>
-      <p className="mt-3 text-3xl font-semibold tracking-tight text-stone-900">{value}</p>
+      <p className="mt-3 min-w-0 text-[clamp(1.8rem,2.3vw,2.6rem)] font-semibold leading-none tracking-tight text-stone-900">
+        {value}
+      </p>
       <p className="mt-2 text-sm leading-6 text-stone-500">{detail}</p>
     </div>
   );

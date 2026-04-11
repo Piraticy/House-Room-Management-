@@ -2,13 +2,14 @@ import { BellRing, CalendarRange, MessageSquareMore, Wallet } from "lucide-react
 import { Role } from "@prisma/client";
 import { AppShell } from "@/components/dashboard/app-shell";
 import { UnitBlueprint } from "@/components/dashboard/unit-blueprint";
+import { UnitFacts } from "@/components/dashboard/unit-facts";
 import {
+  formatCompactCurrency,
   formatCurrency,
   formatDate,
   getTenantDashboardData,
   paymentMethodLabel,
   unitTypeLabel,
-  unitUseLabel,
 } from "@/lib/dashboard";
 import { requireRole } from "@/lib/auth";
 
@@ -82,11 +83,11 @@ export default async function TenantPage({ searchParams }: TenantPageProps) {
       description={sectionMeta.description}
     >
       {section === "overview" ? (
-        <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-4">
           <StatCard icon={CalendarRange} label="Active stay" value={String(data.stats.activeStayCount)} detail="Current room record" />
           <StatCard icon={BellRing} label="Due alerts" value={String(data.stats.nextDueCount)} detail="Near end date" />
           <StatCard icon={MessageSquareMore} label="Messages" value={String(data.stats.inboxCount)} detail="Owner updates" />
-          <StatCard icon={Wallet} label="Payments" value={formatCurrency(data.stats.paidAmount)} detail="Recorded on your stay" />
+          <StatCard icon={Wallet} label="Payments" value={formatCompactCurrency(data.stats.paidAmount)} detail="Recorded on your stay" />
         </section>
       ) : null}
 
@@ -151,7 +152,7 @@ function TenantRoom({ data }: { data: Awaited<ReturnType<typeof getTenantDashboa
           </div>
           <div className="p-5">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="rounded-full bg-teal-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-teal-700">
+              <span className="rounded-full bg-sky-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-sky-700">
                 {unitTypeLabel(data.currentAssignment.unit.type)}
               </span>
               <span className="rounded-full bg-stone-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-stone-700">
@@ -159,18 +160,13 @@ function TenantRoom({ data }: { data: Awaited<ReturnType<typeof getTenantDashboa
               </span>
             </div>
             <h2 className="mt-3 text-2xl font-semibold">{data.currentAssignment.unit.name}</h2>
-            <p className="mt-1 text-sm text-stone-500">
-              {data.currentAssignment.unit.property.name} · {formatCurrency(data.currentAssignment.unit.monthlyRent)} per month
-            </p>
-            <p className="mt-3 text-sm font-medium text-stone-700">
-              {unitUseLabel(data.currentAssignment.unit.type)}
-              {data.currentAssignment.unit.floorLabel
-                ? ` · ${data.currentAssignment.unit.floorLabel}`
-                : ""}
-            </p>
-            <p className="mt-4 text-sm leading-6 text-stone-600">
-              {data.currentAssignment.unit.furnishings ?? "Room information is available from the property team."}
-            </p>
+            <UnitFacts
+              type={data.currentAssignment.unit.type}
+              propertyName={data.currentAssignment.unit.property.name}
+              floorLabel={data.currentAssignment.unit.floorLabel}
+              finalLabel={formatCurrency(data.currentAssignment.unit.monthlyRent)}
+              finalIcon={Wallet}
+            />
           </div>
         </div>
       ) : null}
@@ -229,12 +225,15 @@ function TenantMessages({ data }: { data: Awaited<ReturnType<typeof getTenantDas
       <p className="eyebrow">Messages</p>
       <div className="mt-4 space-y-3">
         {data.messages.map((message) => (
-          <div key={message.id} className="rounded-[22px] bg-stone-950 p-4 text-white">
+          <div
+            key={message.id}
+            className="rounded-[22px] bg-[linear-gradient(135deg,#0f172a,#1e3a8a)] p-4 text-white"
+          >
             <p className="font-semibold">{message.subject}</p>
-            <p className="mt-1 text-xs uppercase tracking-[0.2em] text-stone-400">
+            <p className="mt-1 text-xs uppercase tracking-[0.2em] text-slate-300">
               From {message.sender.name} · {formatDate(message.createdAt)}
             </p>
-            <p className="mt-3 text-sm leading-6 text-stone-300">{message.body}</p>
+            <p className="mt-3 text-sm leading-6 text-slate-100/90">{message.body}</p>
           </div>
         ))}
       </div>
@@ -257,11 +256,13 @@ function StatCard({
     <div className="panel p-5">
       <div className="flex items-center justify-between gap-3">
         <p className="text-sm font-medium text-stone-500">{label}</p>
-        <div className="rounded-2xl bg-stone-100 p-2 text-stone-700">
+        <div className="rounded-2xl bg-sky-50 p-2 text-sky-700">
           <Icon className="size-4" />
         </div>
       </div>
-      <p className="mt-3 text-3xl font-semibold tracking-tight text-stone-900">{value}</p>
+      <p className="mt-3 min-w-0 text-[clamp(1.8rem,2.3vw,2.6rem)] font-semibold leading-none tracking-tight text-stone-900">
+        {value}
+      </p>
       <p className="mt-2 text-sm leading-6 text-stone-500">{detail}</p>
     </div>
   );

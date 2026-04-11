@@ -63,7 +63,7 @@ export function LoginForm({ callbackUrl }: { callbackUrl: string }) {
         {demoAccounts.map((account) => (
           <button
             key={account.label}
-            className="rounded-full border border-stone-200 bg-white px-4 py-2 text-sm font-medium text-stone-700 transition hover:border-teal-300 hover:text-teal-700"
+            className="rounded-full border border-stone-200 bg-white px-4 py-2 text-sm font-medium text-stone-700 transition hover:border-sky-300 hover:text-sky-700"
             type="button"
             onClick={() => {
               setEmail(account.email);

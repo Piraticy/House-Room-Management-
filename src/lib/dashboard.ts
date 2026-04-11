@@ -16,6 +16,11 @@ const currencyFormatter = new Intl.NumberFormat("sw-TZ", {
   maximumFractionDigits: 0,
 });
 
+const compactCurrencyFormatter = new Intl.NumberFormat("en", {
+  notation: "compact",
+  maximumFractionDigits: 1,
+});
+
 const dateFormatter = new Intl.DateTimeFormat("en-TZ", {
   month: "short",
   day: "numeric",
@@ -194,6 +199,10 @@ async function getPayments(where?: {
 
 export function formatCurrency(value: number) {
   return currencyFormatter.format(value);
+}
+
+export function formatCompactCurrency(value: number) {
+  return `TSh ${compactCurrencyFormatter.format(value)}`;
 }
 
 export function formatDate(date: Date) {

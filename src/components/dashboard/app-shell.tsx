@@ -41,15 +41,15 @@ export function AppShell({
             <Link href="/" className="eyebrow">
               Tanga Property Desk
             </Link>
-            <span className="rounded-full bg-teal-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-teal-700">
+            <span className="rounded-full bg-sky-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-sky-700">
               TZS
             </span>
           </div>
 
-          <div className="mt-4 rounded-[26px] bg-stone-950 p-5 text-white">
-            <p className="text-xs uppercase tracking-[0.22em] text-stone-400">{roleLabel}</p>
+          <div className="mt-4 rounded-[26px] bg-[linear-gradient(135deg,#0f172a,#1e3a8a)] p-5 text-white">
+            <p className="text-xs uppercase tracking-[0.22em] text-slate-300">{roleLabel}</p>
             <p className="mt-2 text-xl font-semibold">{userName}</p>
-            <p className="mt-2 text-sm leading-6 text-stone-300">
+            <p className="mt-2 text-sm leading-6 text-slate-200">
               Open one section at a time and keep the day-to-day work clear.
             </p>
           </div>
@@ -70,7 +70,7 @@ export function AppShell({
                 className={cn(
                   "flex items-center justify-between rounded-[20px] px-4 py-3 text-sm font-medium transition",
                   currentPath === item.href
-                    ? "bg-teal-900 text-white shadow-[0_16px_40px_-24px_rgba(15,118,110,0.9)]"
+                    ? "bg-sky-700 text-white shadow-[0_16px_40px_-24px_rgba(37,99,235,0.7)]"
                     : "bg-white/75 text-stone-700 hover:bg-white",
                 )}
               >
@@ -126,7 +126,7 @@ export function AppShell({
                     className={cn(
                       "shrink-0 rounded-full px-4 py-2.5 text-sm font-medium transition",
                       currentTab === tab.href
-                        ? "bg-teal-900 text-white shadow-[0_16px_40px_-24px_rgba(15,118,110,0.9)]"
+                        ? "bg-sky-700 text-white shadow-[0_16px_40px_-24px_rgba(37,99,235,0.7)]"
                         : "bg-white/90 text-stone-700 hover:bg-white",
                     )}
                   >
